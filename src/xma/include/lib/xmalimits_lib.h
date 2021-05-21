@@ -22,8 +22,8 @@
 
 #define MAX_DDR_MAP             64
 #define MAX_XILINX_DEVICES      16
-#define MAX_XILINX_KERNELS      128
-#define MAX_XILINX_SOFT_KERNELS      128
+#define MAX_XILINX_KERNELS      256
+#define MAX_XILINX_SOFT_KERNELS      256
 //#define LIKELY_KERNEL_CONFIGS      16
 //#define MAX_KERNEL_CHANS        64
 #define MAX_KERNEL_FREQS         2
@@ -41,7 +41,7 @@
 #define XMA_NUM_EXECBO_MODE3    8
 #define XMA_NUM_EXECBO_MODE4    64
 
-#define XMA_CPU_MODE1           1  //Low cpu load + high performance 
+#define XMA_CPU_MODE1           1  //Low cpu load + high performance
 #define XMA_CPU_MODE2           2  //High cpu load + high performance
 #define XMA_CPU_MODE3           3  //Same as legacy
 #define XMA_CPU_MODE4           4  //Low cpu load

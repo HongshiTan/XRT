@@ -423,7 +423,7 @@ static int __xocl_subdev_construct(xdev_handle_t xdev_hdl,
 				res[i].end += iostart;
 			/*
 			 * Make sure the resource of subdevice is a
-			 * child of the pci bar resource in the 
+			 * child of the pci bar resource in the
 			 * resource tree.
 			 */
 			res[i].parent = &(core->pdev->resource[bar_idx]);
@@ -1304,7 +1304,7 @@ xocl_subdev_vsec_read32(xdev_handle_t xdev, int bar, u64 offset)
  * |----------------------+-----|
  * | rsvd                       |
  * |----------------------------|
- *   ... start 1st entry ...          
+ *   ... start 1st entry ...
  * +--------------+---+---+-----|
  * |uuid(15:0)    |bar|rev| type|
  * |--------------+---+---+-----|
@@ -1336,7 +1336,7 @@ xocl_subdev_vsec(xdev_handle_t xdev, u32 type,
 		xocl_info(&core->pdev->dev, "No Vendor Specific Capability found.");
 		return -EINVAL;
 	}
-
+	xocl_info(&core->pdev->dev, "BUILD TIME: %s %s",__DATE__ , __TIME__);
 	/* get vendor specific offset */
 	if (pci_read_config_dword(pdev, cap+8, &off_low) ||
 	    pci_read_config_dword(pdev, cap+12, &off_high)) {
@@ -1586,7 +1586,7 @@ void xocl_fill_dsa_priv(xdev_handle_t xdev_hdl, struct xocl_board_private *in)
 		xocl_fetch_dynamic_platform(core, &in, ptype);
 		vsec = true;
 	}
-		
+
 	/* workaround firewall completer abort issue */
 	cap = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_ERR);
 	if (cap) {
@@ -1878,7 +1878,7 @@ int xocl_wait_pci_status(struct pci_dev *pdev, u16 mask, u16 val, int timeout)
 	}
 
 	xocl_info(&pdev->dev, "waiting for %d ms", i);
-	if (i == timeout) 
+	if (i == timeout)
 		return -ETIME;
 
 	return 0;
