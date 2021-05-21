@@ -2,10 +2,11 @@
 
 set -e
 
+
 OSDIST=`grep '^ID=' /etc/os-release | awk -F= '{print $2}' | tr -d '"'`
 BUILDDIR=$(readlink -f $(dirname ${BASH_SOURCE[0]}))
 CORE=`grep -c ^processor /proc/cpuinfo`
-CMAKE=cmake
+CMAKE=/usr/bin/cmake
 CPU=`uname -m`
 
 if [[ $OSDIST == "centos" ]] || [[ $OSDIST == "amzn" ]] || [[ $OSDIST == "rhel" ]] || [[ $OSDIST == "fedora" ]]; then
@@ -260,8 +261,8 @@ if [[ $CPU != "aarch64" ]] && [[ $edge == 1 ]]; then
   time make -j $jcore $verbose DESTDIR=$PWD
   cd $BUILDDIR
 fi
-    
-    
+
+
 if [[ $clangtidy == 1 ]]; then
     echo "make clang-tidy"
     make clang-tidy

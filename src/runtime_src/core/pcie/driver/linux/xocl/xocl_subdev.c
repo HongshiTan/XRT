@@ -1332,11 +1332,12 @@ xocl_subdev_vsec(xdev_handle_t xdev, u32 type,
 
 	/* Check vendor specific section for vsec_id 0x20 */
 	cap = xocl_subdev_find_vsec_offset(xdev);
+	xocl_info(&core->pdev->dev, "BUILD TIME: 1");
 	if (!cap) {
 		xocl_info(&core->pdev->dev, "No Vendor Specific Capability found.");
 		return -EINVAL;
 	}
-	xocl_info(&core->pdev->dev, "BUILD TIME: %s %s",__DATE__ , __TIME__);
+
 	/* get vendor specific offset */
 	if (pci_read_config_dword(pdev, cap+8, &off_low) ||
 	    pci_read_config_dword(pdev, cap+12, &off_high)) {
