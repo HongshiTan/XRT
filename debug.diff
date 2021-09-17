@@ -1,0 +1,100 @@
+diff --git a/build/local_build.sh b/build/local_build.sh
+index ea0fe8ac9..22f01a7c3 100755
+--- a/build/local_build.sh
++++ b/build/local_build.sh
+@@ -3,4 +3,4 @@
+ source  /opt/Xilinx/Vitis/2020.2/settings64.sh
+ env XRT_BOOST_INSTALL=/home/xtra/XRT/boost/xrt ./build.sh
+ cd Release
+-make package
++#make package
+diff --git a/src/runtime_src/core/common/config_reader.h b/src/runtime_src/core/common/config_reader.h
+index f6863d651..36ddaa19f 100755
+--- a/src/runtime_src/core/common/config_reader.h
++++ b/src/runtime_src/core/common/config_reader.h
+@@ -295,7 +295,7 @@ inline unsigned int
+ get_verbosity()
+ {
+   // Allow this configure value to change on the fly
+-  unsigned int value = detail::get_uint_value("Runtime.verbosity",4);
++  unsigned int value = detail::get_uint_value("Runtime.verbosity",7);
+   return value;
+ }
+ 
+diff --git a/src/runtime_src/core/pcie/linux/shim.cpp b/src/runtime_src/core/pcie/linux/shim.cpp
+index 7fed9598e..3b3542292 100644
+--- a/src/runtime_src/core/pcie/linux/shim.cpp
++++ b/src/runtime_src/core/pcie/linux/shim.cpp
+@@ -1388,7 +1388,7 @@ int shim::xclLoadAxlf(const axlf *buffer)
+     xrt_logmsg(XRT_INFO, "%s, buffer: %s", __func__, buffer);
+     drm_xocl_axlf axlf_obj = {const_cast<axlf *>(buffer), 0};
+     int off = 0;
+-
++    xrt_logmsg(XRT_INFO, "%s, buffer: %s", __func__, buffer);
+     auto kernels = xrt_core::xclbin::get_kernels(buffer);
+     /* Calculate size of kernels */
+     for (auto& kernel : kernels) {
+@@ -1426,20 +1426,40 @@ int shim::xclLoadAxlf(const axlf *buffer)
+      * |   ...                 |
+      * +-----------------------+
+      */
++    xrt_logmsg(XRT_INFO, "%s: %d", __func__, __LINE__);
+     std::vector<char> krnl_binary(axlf_obj.ksize);
++    xrt_logmsg(XRT_INFO, "%s: %d", __func__, __LINE__);
+     axlf_obj.kernels = krnl_binary.data();
++    xrt_logmsg(XRT_INFO, "%s: %d", __func__, __LINE__);
+     for (auto& kernel : kernels) {
+         auto krnl = reinterpret_cast<kernel_info *>(axlf_obj.kernels + off);
+         if (kernel.name.size() > sizeof(krnl->name))
++        {
++            xrt_logmsg(XRT_ERROR, "name size %s: %d", __func__, __LINE__);
+             return -EINVAL;
++        }
+         std::strncpy(krnl->name, kernel.name.c_str(), sizeof(krnl->name)-1);
+         krnl->name[sizeof(krnl->name)-1] = '\0';
+         krnl->anums = kernel.args.size();
+ 
+         int ai = 0;
++        int counter = 0;
+         for (auto& arg : kernel.args) {
+             if (arg.name.size() > sizeof(krnl->args[ai].name))
++            {
++
++                xrt_logmsg(XRT_ERROR, "arg size %s: %d %d , %d %d %d", arg.name.c_str(),
++                    arg.name.size(),
++                    sizeof(krnl->args[ai].name),
++                    sizeof(krnl->name),
++                    ai, __LINE__);
+                 return -EINVAL;
++            }
++            xrt_logmsg(XRT_INFO, "arg %s: %d %d , %d @%d", arg.name.c_str(),
++                    arg.name.size(),
++                    sizeof(krnl->args[ai].name),
++                    ai, __LINE__);
++            counter ++;
+             std::strncpy(krnl->args[ai].name, arg.name.c_str(), sizeof(krnl->args[ai].name)-1);
+             krnl->args[ai].name[sizeof(krnl->args[ai].name)-1] = '\0';
+             krnl->args[ai].offset = arg.offset;
+@@ -1453,7 +1473,7 @@ int shim::xclLoadAxlf(const axlf *buffer)
+         }
+         off += sizeof(kernel_info) + sizeof(argument_info) * kernel.args.size();
+     }
+-
++    xrt_logmsg(XRT_INFO, "%s: %d", __func__, __LINE__);
+     int ret = mDev->ioctl(mUserHandle, DRM_IOCTL_XOCL_READ_AXLF, &axlf_obj);
+     if(ret)
+         return -errno;
+diff --git a/src/runtime_src/core/pcie/tools/xbutil/xbutil.h b/src/runtime_src/core/pcie/tools/xbutil/xbutil.h
+index da9f9a877..a00bd1021 100644
+--- a/src/runtime_src/core/pcie/tools/xbutil/xbutil.h
++++ b/src/runtime_src/core/pcie/tools/xbutil/xbutil.h
+@@ -1595,7 +1595,9 @@ public:
+         char *buffer = new char[length];
+         stream.read(buffer, length);
+         const xclBin *header = (const xclBin *)buffer;
++        std::cout << "Programming " << std::endl;
+         int result = xclLoadXclBin(m_handle, header);
++        std::cout << "Programming  end" << std::endl;
+         delete [] buffer;
+ 
+         return result;
