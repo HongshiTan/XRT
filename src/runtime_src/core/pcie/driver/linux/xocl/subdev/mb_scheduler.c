@@ -2015,6 +2015,7 @@ exec_cfg_cmd(struct exec_core *exec, struct xocl_cmd *xcmd)
 		cu_reset(xcu, cuidx, exec->base, cfg->data[cuidx], polladdr);
 	}
 	exec->num_cus = cfg->num_cus;
+    userpf_info(xdev, "Regular CUs %d\n", cuidx);
 
 	// Create KDMA CUs
 	if (cdma) {
@@ -3839,6 +3840,10 @@ client_reserve_implicit_cus(struct exec_core *exec, struct client_ctx *client)
 		SCHED_DEBUGF("+ cu(%d)", i);
 		set_bit(i, client->cu_bitmap);
 	}
+
+    //for (i = 0; i < exec->num_cus; i++) {
+        SCHED_DEBUGF("+ bitmap(%lu)",*(client->cu_bitmap));
+    //}
 	SCHED_DEBUGF("<- %s", __func__);
 }
 
@@ -4105,6 +4110,7 @@ static int client_ioctl_ctx(struct platform_device *pdev,
 		ret = -EBUSY;
 		goto out;
 	}
+    SCHED_DEBUGF("+ bitmap(%lu)",*(client->cu_bitmap));
 
 	ret = cuidx_valid(xdev, cu_idx);
 
@@ -4163,7 +4169,7 @@ static int client_ioctl_ctx(struct platform_device *pdev,
 			// Context was previously allocated for the same CU,
 			// cannot allocate again. Need to implement per CU ref
 			// counter to make it work.
-			userpf_err(xdev, "CTX already added by this process");
+			userpf_err(xdev, "CTX %d already added by this process", cu_idx);
 			ret = -EINVAL;
 			goto out;
 		}

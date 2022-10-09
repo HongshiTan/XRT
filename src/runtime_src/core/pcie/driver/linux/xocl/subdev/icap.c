@@ -1521,6 +1521,8 @@ static int icap_create_subdev_cu(struct platform_device *pdev)
 
 		if (ip->m_base_address == 0xFFFFFFFF)
 			continue;
+		if (ip->m_base_address == -1)
+			continue;
 
 		memset(&info, 0, sizeof(info));
 		/* NOTE: Only support 64 instences in subdev framework */

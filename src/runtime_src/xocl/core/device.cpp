@@ -719,6 +719,8 @@ device::memidx_type
 device::
 get_cu_memidx() const
 {
+  XOCL_DEBUGF("xocl::device%d %d \n",__LINE__,m_cu_memidx);
+  XOCL_DEBUGF("xocl::device%d %d \n",__LINE__,get_num_cus());
   std::lock_guard<std::mutex> lk(m_mutex);
   if (m_cu_memidx == -2) {
     m_cu_memidx = -1;
@@ -728,8 +730,10 @@ get_cu_memidx() const
       memidx_bitmask_type mask;
       mask.set();
       for (auto& cu : get_cu_range())
+      {
         mask &= cu->get_memidx_intersect();
-
+        XOCL_DEBUGF("xocl::device %d %s %x\n",__LINE__,cu->get_name().c_str(),cu->get_memidx_intersect());
+      }
       // Select first common Group index if present prior to bank index.
       // Traverse from the higher order of the mask as groups comes in higher order
       for (int idx=mask.size() - 1; idx >= 0; --idx) {

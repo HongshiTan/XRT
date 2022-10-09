@@ -108,20 +108,28 @@ create(const xclbin::symbol* symbol, const xclbin::symbol::instance& inst,
   // be found in cu2addr.  Here we rely on the sorted cu2addr having
   // the streaming / unused CUs at the end and we just arbitrarily
   // give the compute unit the index of the last entry in the array.
-  size_t idx = itr!=cu2addr.end()
-    ? std::distance(cu2addr.begin(),itr)
-    : cu2addr.size()-1;  // unused cus are pushed to end
+  if (itr!=cu2addr.end())
+  {
+    size_t idx = itr!=cu2addr.end()
+      ? std::distance(cu2addr.begin(),itr)
+      : 0xffff;  // unused cus are pushed to end
 
-  // streaming CUs have a bogus / unused base address, the address
-  // doesn't matter we just use max, which corresponds to the sort
-  // order in cu2addr.
-  size_t addr = itr!=cu2addr.end()
-    ? (*itr)
-    : std::numeric_limits<size_t>::max(); // addr doesn't matter
+    // streaming CUs have a bogus / unused base address, the address
+    // doesn't matter we just use max, which corresponds to the sort
+    // order in cu2addr.
+    size_t addr = itr!=cu2addr.end()
+      ? (*itr)
+      : std::numeric_limits<size_t>::max(); // addr doesn't matter
 
-  // Unfortunately make_unique can't access private ctor
-  // return std::make_unique<compute_unit>(symbol,inst.name,inst.base,idx,device);
-  return std::unique_ptr<compute_unit>(new compute_unit(symbol,inst.name,addr,idx,device));
+    // Unfortunately make_unique can't access private ctor
+    // return std::make_unique<compute_unit>(symbol,inst.name,inst.base,idx,device);
+    return std::unique_ptr<compute_unit>(new compute_unit(symbol,inst.name,addr,idx,device));
+  }
+  else
+  {
+      return nullptr;
+  }
+
 }
 
 } // xocl

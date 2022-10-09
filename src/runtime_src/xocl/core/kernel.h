@@ -513,6 +513,7 @@ public:
   void
   set_argument(unsigned long idx, size_t sz, const void* arg)
   {
+    XOCL_DEBUGF("xocl::kernel:: %s %d %d  %d\n",m_symbol.name.c_str(), m_indexed_args.size(),idx,sz );
     m_indexed_args.at(idx)->set(idx,sz,arg);
   }
 

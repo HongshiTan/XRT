@@ -36,7 +36,7 @@ class compute_unit
   friend class device;
   enum class context_type : unsigned short { shared, exclusive, none };
 public:
-  const size_t max_index = 128;
+  const size_t max_index = 512;
 
 private:
   // construct through static create only

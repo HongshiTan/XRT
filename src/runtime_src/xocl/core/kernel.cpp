@@ -173,13 +173,16 @@ set(size_t size, const void* cvalue)
 {
   if (size != sizeof(cl_mem))
     throw error(CL_INVALID_ARG_SIZE,"Invalid global_argument size for kernel arg");
-
+  XOCL_DEBUGF("kernel::global_arge\n");
   auto value = const_cast<void*>(cvalue);
   auto mem = value ? *static_cast<cl_mem*>(value) : nullptr;
 
   m_buf = xocl(mem);
   if (m_argidx < std::numeric_limits<unsigned long>::max())
+  {
+    XOCL_DEBUGF("kernel::assign_buffer_to_argidx %d %x \n", m_argidx,cvalue);
     m_kernel->assign_buffer_to_argidx(m_buf.get(),m_argidx);
+  }
   m_set = true;
 }
 
@@ -294,6 +297,7 @@ kernel(program* prog, const std::string& name, const xclbin::symbol& symbol)
   XOCL_DEBUG(std::cout,"xocl::kernel::kernel(",m_uid,")\n");
 
   for (auto& arg : m_symbol.arguments) {
+    XOCL_DEBUG(std::cout,"xocl::kernel::kernel.arg(",arg.name,")\n");
     switch (arg.atype) {
     case xclbin::symbol::arg::argtype::printf:
       if (m_printf_args.size())
@@ -464,18 +468,31 @@ kernel::
 assign_buffer_to_argidx(memory* buf, unsigned long argidx)
 {
   bool trim = buf->set_kernel_argidx(this,argidx);
+  XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
 
   // Do early buffer allocation if context has single active device
   auto ctx = buf->get_context();
+  XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
+
   auto device = ctx->get_single_active_device();
+  XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
+
   if (device) {
+    XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);;
     auto boh = buf->get_buffer_object(device);
+    XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
     if (trim) {
+      XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
       auto memidx = buf->get_memidx();
+      XOCL_DEBUGF("memidex %d\n",memidx);
+
       assert(memidx>=0);
       validate_cus(device,argidx,memidx);
     }
   }
+  XOCL_DEBUGF("xocl::kernel%d\n",__LINE__);
+
+  XOCL_DEBUGF("xocl::kernel---%d\n",m_cus.size());
 
   if (m_cus.empty())
     //connectivity_debug();

@@ -70,6 +70,11 @@ is_valid_cu(const ip_data& ip)
 {
   if (ip.m_type != IP_TYPE::IP_KERNEL)
     return false;
+  if (ip.m_base_address == static_cast<size_t>(-1))
+  {
+    return false;
+  }
+
 
   // Filter IP KERNELS if necessary
   // ...

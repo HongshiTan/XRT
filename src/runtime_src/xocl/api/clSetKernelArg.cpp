@@ -40,7 +40,7 @@ xcl_conformancecollect()
 
 namespace xocl {
 
-static void
+ void
 validOrError(cl_kernel    kernel,
              cl_uint      arg_index,
              size_t       arg_size,
@@ -110,7 +110,7 @@ clSetKernelArg(cl_kernel    kernel,
                size_t       arg_size,
                const void * arg_value)
 {
-  validOrError(kernel,arg_index,arg_size,arg_value);
+  //validOrError(kernel,arg_index,arg_size,arg_value);
 
   // XCL_CONFORMANCECOLLECT mode, not sure why return here?
   if (xcl_conformancecollect())
@@ -146,6 +146,7 @@ clSetKernelArg(cl_kernel    kernel,
   try {
     PROFILE_LOG_FUNCTION_CALL;
     LOP_LOG_FUNCTION_CALL;
+    XOCL_DEBUGF("debug\n");
     return xocl::clSetKernelArg(kernel,arg_index,arg_size,arg_value);
   }
   catch (const xocl::error& ex) {
@@ -155,7 +156,7 @@ clSetKernelArg(cl_kernel    kernel,
     return ex.get_code();
   }
   catch (const std::out_of_range&) {
-    std::string msg = "bad kernel argument index " + std::to_string(arg_index);
+    std::string msg = "bad kernel arg argument index " + std::to_string(arg_index);
     xocl::send_exception_message(msg.c_str());
     return CL_INVALID_ARG_INDEX;
   }

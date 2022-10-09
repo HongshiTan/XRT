@@ -166,13 +166,16 @@ get_buffer_object(device* device, memory::memidx_type subidx)
 {
   std::lock_guard<std::mutex> lk(m_boh_mutex);
   auto itr = m_bomap.find(device);
+  XOCL_DEBUGF("xocl::memory%d\n",__LINE__);
 
   if (itr!=m_bomap.end())
     return (*itr).second;
-
+  XOCL_DEBUGF("xocl::memory%d\n",__LINE__);
   // Get memory bank index if assigned, -1 if not assigned, which will trigger
   // allocation error when default allocation is disabled
+  XOCL_DEBUGF("xocl::memory %d %d \n",__LINE__, subidx);
   get_memidx_nolock(device, subidx); // computes m_memidx
+  XOCL_DEBUGF("xocl::memory %d %d \n",__LINE__, subidx);
   auto boh = (m_bomap[device] = device->allocate_buffer_object(this,m_memidx));
 
   // To be deleted when strict bank rules are enforced
@@ -308,29 +311,30 @@ get_memidx_nolock(const device* dev, memory::memidx_type subidx) const
     if (m_memidx>=0)
       return m_memidx;
   }
-
+  XOCL_DEBUGF("xocl::memory%d\n",__LINE__);
   // ext assigned
   m_memidx = get_ext_memidx_nolock(dev->get_xclbin());
-
+ XOCL_DEBUGF("xocl::memory%d %d \n",__LINE__,m_memidx);
   if (m_memidx>=0)
     return m_memidx;
 
   // unique CU connectivity
   m_memidx = dev->get_cu_memidx();
-
+  XOCL_DEBUGF("xocl::memory%d %d \n",__LINE__,m_memidx);
   if (m_memidx>=0)
     return m_memidx;
 
   if (m_karg.empty())
     // memory index could be from sub-buffer
     return (m_memidx = subidx);
-
+  XOCL_DEBUGF("xocl::memory%d %d \n",__LINE__,m_memidx);
   // kernel,argidx deduced
   memidx_bitmask_type mset;
   mset.set();
   for (auto& karg : m_karg) {
     auto kernel = karg.first;
     auto argidx = karg.second;
+     XOCL_DEBUGF("xocl::memory%d %d \n",__LINE__,kernel->get_memidx(dev,argidx));
     mset &= kernel->get_memidx(dev,argidx);
   }
 

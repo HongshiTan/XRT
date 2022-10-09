@@ -178,11 +178,19 @@ add_compute_units(device* device)
   // Collect kernel's filtered CUs
   std::bitset<128> kernel_cus;
   for (auto cu : m_kernel->get_cus())
-    kernel_cus.set(cu->get_index());
+  {
+    if (cu->get_index() != 0xffff)
+      kernel_cus.set(cu->get_index());
+  }
 
   // Targeted device CUs matching kernel CUs
   for (auto& scu : device->get_cus()) {
     auto cu = scu.get();
+    XOCL_DEBUGF("execution_context(%d) starting add cu(%d)\n",m_uid,cu->get_uid());
+    if (cu->get_index() == 0xffff)
+    {
+      continue;
+    }
     if (kernel_cus.test(cu->get_index())) {
 
       // Check context creation

@@ -89,7 +89,7 @@ clSetKernelArgSVMPointer(cl_kernel    kernel,
     return ex.get_code();
   }
   catch (const std::out_of_range&) {
-    std::string msg = "bad kernel argument index " + std::to_string(arg_index);
+    std::string msg = "bad kernel mem argument index " + std::to_string(arg_index);
     xocl::send_exception_message(msg.c_str());
     return CL_INVALID_ARG_INDEX;
   }
